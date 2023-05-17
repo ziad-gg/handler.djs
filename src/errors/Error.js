@@ -5,7 +5,7 @@ function HandlerError(message, type = "InvalidType") {
     this.type = type;
 
     Error.captureStackTrace(this, this.constructor);
-}
+};
 
 HandlerError.prototype = Object.create(Error.prototype);
 HandlerError.prototype.constructor = HandlerError;

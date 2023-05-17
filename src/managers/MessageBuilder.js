@@ -38,7 +38,7 @@ class MessageBuilder extends Message {
     return User;
   }
 
-  async sendTimedMessage(option, time, reference) {
+   sendTimedMessage(option, time, reference) {
     if (reference) {
       this.reply(option).then(m => setTimeout(() => m.delete(), time))
     } else {
@@ -74,7 +74,7 @@ class MessageBuilder extends Message {
     return this.Command.getAttr(key);
   }
 
-  async reply(options) {
+  reply(options) {
     return new Promise((resolve, reject) => {
       const Routes = this.api.Routes;
 
@@ -98,7 +98,7 @@ class MessageBuilder extends Message {
     });
   };
 
-  async replyNoMention(options) {
+  replyNoMention(options) {
     return new Promise((resolve, reject) => {
 
       const Routes = this.api.Routes;
@@ -127,7 +127,7 @@ class MessageBuilder extends Message {
     });
   };
 
-  async followUp(options) {
+   followUp(options) {
     return new Promise((resolve, reject) => {
       const Routes = this.api.Routes;
       if (!this.replid?.message_id) throw new Error("The reply to this message has not been sent");
@@ -140,7 +140,7 @@ class MessageBuilder extends Message {
     })
   };
 
-  async edit(options) {
+  edit(options) {
     return new Promise((resolve, reject) => {
       const Routes = this.api.Routes;
       options['Content-Type'] = 'application/json';
