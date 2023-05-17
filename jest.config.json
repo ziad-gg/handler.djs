@@ -1,0 +1,6 @@
+{
+    "terminal.integrated.automationProfile.osx": {
+        "args": ["-l"],
+        "path": "/bin/bash"
+    }
+}
