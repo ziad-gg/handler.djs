@@ -1,0 +1,103 @@
+const { CommandInteraction, Client } = require("discord.js");
+const Application = require('../structures/Application.js');
+// const MessageBuilder = require('./MessageBuilder.js');
+
+class InteractionBuilder extends CommandInteraction {
+    constructor(client, ApiInteraction, Application) {
+        super(client, ApiInteraction)
+
+        this.ApiRes = ApiInteraction
+        /** @type {Application} */
+        this.Application = Application;
+        this.Api = ApiInteraction;
+
+        this.prefix = this.Application.prefix;
+        this.data = Application.data;
+
+        this.stoped = false;
+
+        // this
+    };
+
+    async sendTimedMessage(option, time, reference) {
+        if (reference) {
+          this.reply(option).then(m => setTimeout(() => m.delete(), time))
+        } else {
+          this.channel.send(option).then(m => setTimeout(() => m.delete(), time))
+        }
+    };
+
+    run() {
+
+        this.author = this.user;
+
+        this.cmdName = this.commandName;
+        this.isCmd = this.Application.getCommand(this.cmdName) ? true : false;
+        this.author.isOwner = this.Application.owners.includes(this.author.id);
+        this.Command = this.Application.getCommand(this.cmdName);
+
+        this.replyNoMention = this.reply;
+
+        return this;
+    };
+
+    args() {
+
+        /** @type {Array} */
+        const options = this.ApiRes.data.options || [];
+        
+        for (let i = 0; i < options.length; i++ ) {
+         this[i] = options[i].value;
+         this[options[i].name] = options[i].value;
+        }
+
+        // for (const arg of this.Command.options) {
+        //     const option = options.find(op => op.name.toLowerCase() === arg.name.toLowerCase());
+        //     if (!option && arg.required) throw new Error(`${arg.name} is not Found in Interaction Data`);
+        //     else if (!option && !arg[2]) continue;
+        //     this[arg.index] = option.value;
+        //     this[arg.name] = option.value;
+        // };
+    };
+
+
+    isStoped() {
+        return this.stoped
+    };
+
+    stop() {
+        this.stoped = true;
+        return this
+    };
+
+    getData(key) {
+        return this.Application.data.get(key);
+    };
+
+    getAttr(key) {
+     return this.Command.getAttr(key);
+    }
+
+    slice(start, end) {
+        if (typeof start !== 'number' || typeof end !== 'number') {
+            throw new TypeError('Start and end arguments must be numbers');
+        }
+        if (start < 0 || end < 0) {
+            throw new RangeError('Start and end arguments must be positive numbers');
+        }
+        if (start > end) {
+            throw new RangeError('Start argument cannot be greater than end argument');
+        }
+
+        const args = [];
+        for (let i = start; i <= end; i++) {
+            if (typeof this[i] !== 'undefined') {
+                args.push(this[i]);
+            }
+        }
+        return args;
+    };
+};
+
+
+module.exports = InteractionBuilder

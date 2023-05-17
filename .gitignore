@@ -1,0 +1,9 @@
+.env
+test
+package
+node_modules
+.eslintrc.json
+.prettierrc.json
+CHANGELOG.md
+jest.config.json
+npm

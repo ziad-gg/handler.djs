@@ -1,0 +1,60 @@
+{
+  "name": "handler.djs",
+  "version": "2.4.0",
+  "description": "A package to manage all discord bot Files",
+  "types": "src/@types/index.d.ts",
+  "author": "Ziath#1768 <zemad3040@gmail.com>",
+  "keywords": [
+    "discord.js",
+    "discord-handler",
+    "handler",
+    "djs-handler",
+    "djs-commander",
+    "djs",
+    "Handler.djs",
+    "Handler.js",
+    "ZIATH",
+    "DIscordbot",
+    "discord handler"
+  ],
+  "main": "src/index.js",
+  "dependencies": {
+    "@discordjs/rest": "^1.7.1",
+    "@discordjs/ws": "^0.8.2",
+    "axios": "^1.1.3",
+    "discord-api-types": "^0.37.41",
+    "discord.js": "^14.11.0",
+    "handler.djs": "^2.2.8",
+    "ms": "^2.1.3",
+    "ws": "^8.13.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test/index.js",
+    "package": "node package/index.js",
+    "package-w": "nodemon package/index.js",
+    "jest-test": "jest",
+    "jestW": "jest --W",
+    "watch": "nodemon",
+    "node-p": "npm publish --access"
+  },
+  "engines": {
+    "node": ">=16.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ziad-gg/handler.djs"
+  },
+  "bugs": {
+    "url": "https://github.com/ziad-gg/handler.djs/issues"
+  },
+  "homepage": "https://handler.dsjx.repl.co/",
+  "license": "MIT",
+  "devDependencies": {
+    "dotenv": "^16.0.3",
+    "jest": "^29.5.0",
+    "mkdirp": "^3.0.0",
+    "nodemon": "^2.0.22",
+    "sqlite3": "^5.1.6"
+  }
+}
