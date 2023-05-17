@@ -31,12 +31,11 @@ new Application(client, {
   commandsPath: path.join(__dirname, 'commands'),
 });
 
-client.Application.setPrefix("!"); // set Bot Prefix
+client.Application.setPrefix("!");
 
-client.Application.build(); // build the app
+client.Application.build();
 
-
-client.login(yourToken)
+client.login(yourToken);
 ```
 
 

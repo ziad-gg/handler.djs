@@ -25,9 +25,7 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "experimentalDecorators": true,
-        "lib": [
-            "ESNext"
-        ],
+        "lib": [ "ESNext" ],
         "target": "ES2021",
         "useDefineForClassFields": true
     }
