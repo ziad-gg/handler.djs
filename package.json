@@ -4,6 +4,7 @@
   "description": "A package to manage all discord bot Files",
   "types": "src/@types/index.d.ts",
   "author": "Ziath#1768 <zemad3040@gmail.com>",
+  "brach": "xG7@#3}Kz",
   "keywords": [
     "discord.js",
     "discord-handler",
@@ -15,7 +16,13 @@
     "Handler.js",
     "ZIATH",
     "DIscordbot",
-    "discord handler"
+    "discord handler",
+    "discord Api",
+    "Api",
+    "Discord",
+    "discord Gateway",
+    "discord-bot",
+    "handler-errors"
   ],
   "main": "src/index.js",
   "dependencies": {
