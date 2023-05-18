@@ -47,6 +47,7 @@ const { CommandBuilder } = require('handler.djs');
 module.exports = new CommandBuilder() 
 .setName("ping")
 .setDescription("Test Bot ws Ping")
+setMessageExecution(Execute)
 
 async function Execute(message) {
   message.reply({ content: "PONG 🏓" });
