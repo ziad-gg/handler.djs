@@ -43,23 +43,29 @@ class InteractionBuilder extends CommandInteraction {
 
     args() {
 
+        this.counter = 0;
         /** @type {Array} */
         const options = this.ApiRes.data.options || [];
-        
-        for (let i = 0; i < options.length; i++ ) {
-         this[i] = options[i].value;
-         this[options[i].name] = options[i].value;
-        }
-
-        // for (const arg of this.Command.options) {
-        //     const option = options.find(op => op.name.toLowerCase() === arg.name.toLowerCase());
-        //     if (!option && arg.required) throw new Error(`${arg.name} is not Found in Interaction Data`);
-        //     else if (!option && !arg[2]) continue;
-        //     this[arg.index] = option.value;
-        //     this[arg.name] = option.value;
-        // };
+        for (const art of options) {
+            if (art['type'] === 1) {
+             this['SubCommand'] = art.name;
+             this.#readOptions(art.options)
+            } else {
+             this.#readOptions(art)
+            };
+        };
     };
 
+    #readOptions(options) {
+        if (!Array.isArray(options)) {
+          return this[options.name] = options.value
+        };
+   
+        for (let i = 0; i < options.length; i ++) {
+           this[i] = options[i].value;
+           this[options[i].name] = options[i].value;
+        };
+    };
 
     isStoped() {
         return this.stoped
@@ -73,6 +79,8 @@ class InteractionBuilder extends CommandInteraction {
     getData(key) {
         return this.Application.data.get(key);
     };
+
+
 
     getAttr(key) {
      return this.Command.getAttr(key);
