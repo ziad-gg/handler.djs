@@ -40,9 +40,15 @@ class MessageBuilder extends Message {
 
    sendTimedMessage(option, time, reference) {
     if (reference) {
-      this.reply(option).then(m => setTimeout(() => m.delete(), time))
+      this.reply(option).then(m => { 
+        setTimeout(() => m.delete(), time)
+        return m;
+      })
     } else {
-      this.channel.send(option).then(m => setTimeout(() => m.delete(), time))
+      this.channel.send(option).then(m => {
+        setTimeout(() => m.delete(), time)
+        return m;
+      })
     }
   }
 

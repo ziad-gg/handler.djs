@@ -21,9 +21,9 @@ class InteractionBuilder extends CommandInteraction {
 
     async sendTimedMessage(option, time, reference) {
         if (reference) {
-          this.reply(option).then(m => setTimeout(() => m.delete(), time))
+            this.reply(option).then(m => setTimeout(() => m.delete(), time))
         } else {
-          this.channel.send(option).then(m => setTimeout(() => m.delete(), time))
+            this.channel.send(option).then(m => setTimeout(() => m.delete(), time))
         }
     };
 
@@ -48,22 +48,31 @@ class InteractionBuilder extends CommandInteraction {
         const options = this.ApiRes.data.options || [];
         for (const art of options) {
             if (art['type'] === 1) {
-             this['SubCommand'] = art.name;
-             this.#readOptions(art.options)
+                this['SubCommand'] = art.name;
+                this.#readOptions(art.options)
             } else {
-             this.#readOptions(art)
+                this.#readOptions(art)
             };
         };
     };
 
+    async getUser(id) {
+        const regex = /^[0-9]{16,20}$/;
+        let User = await this.client.users.cache.get(id);
+        if (!User) User = await this.guild.members.cache.get(id);
+        if (!User) User = await this.client.users.fetch(id).then(user => user).catch(e => null);
+        if (!User) User = await this.guild.members.fetch(id).then(user => user).catch(e => null);
+        return User;
+    }
+
     #readOptions(options) {
         if (!Array.isArray(options)) {
-          return this[options.name] = options.value
+            return this[options.name] = options.value
         };
-   
-        for (let i = 0; i < options.length; i ++) {
-           this[i] = options[i].value;
-           this[options[i].name] = options[i].value;
+
+        for (let i = 0; i < options.length; i++) {
+            this[i] = options[i].value;
+            this[options[i].name] = options[i].value;
         };
     };
 
@@ -83,7 +92,7 @@ class InteractionBuilder extends CommandInteraction {
 
 
     getAttr(key) {
-     return this.Command.getAttr(key);
+        return this.Command.getAttr(key);
     }
 
     slice(start, end) {
