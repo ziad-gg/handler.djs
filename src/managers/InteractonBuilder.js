@@ -19,13 +19,25 @@ class InteractionBuilder extends CommandInteraction {
         // this
     };
 
-    async sendTimedMessage(option, time, reference) {
-        if (reference) {
-            this.reply(option).then(m => setTimeout(() => m.delete(), time))
-        } else {
-            this.channel.send(option).then(m => setTimeout(() => m.delete(), time))
-        }
-    };
+
+    sendTimedMessage(option, time, reference) {
+        return new Promise((res, rej) => {
+            if (reference) {
+                this.reply(option).then(m => {
+                    res(m)
+                    setTimeout(() => m.delete(), time)
+                })
+            } else {
+                this.channel.send(option).then(m => {
+                    res(m)
+                    setTimeout(() => m.delete(), time)
+                })
+            }
+        })
+
+    }
+
+
 
     run() {
 

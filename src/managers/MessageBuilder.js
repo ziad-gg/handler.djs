@@ -38,18 +38,21 @@ class MessageBuilder extends Message {
     return User;
   }
 
-   sendTimedMessage(option, time, reference) {
-    if (reference) {
-      this.reply(option).then(m => { 
-        setTimeout(() => m.delete(), time)
-        return m;
-      })
-    } else {
-      this.channel.send(option).then(m => {
-        setTimeout(() => m.delete(), time)
-        return m;
-      })
-    }
+  sendTimedMessage(option, time, reference) {
+    return new Promise((res, rej) => {
+      if (reference) {
+        this.reply(option).then(m => {
+          res(m)
+          setTimeout(() => m.delete(), time)
+        })
+      } else {
+        this.channel.send(option).then(m => {
+          res(m)
+          setTimeout(() => m.delete(), time)
+        })
+      }
+    })
+
   }
 
   run() {
@@ -133,7 +136,7 @@ class MessageBuilder extends Message {
     });
   };
 
-   followUp(options) {
+  followUp(options) {
     return new Promise((resolve, reject) => {
       const Routes = this.api.Routes;
       if (!this.replid?.message_id) throw new Error("The reply to this message has not been sent");
@@ -151,12 +154,12 @@ class MessageBuilder extends Message {
       const Routes = this.api.Routes;
       options['Content-Type'] = 'application/json';
       this.REST.patch(Routes.channelMessage(this.channel.id, this.id), { body: options })
-      }).then((data) => {
-        resolve(new MessageBuilder(this.client, data, this.Application))
-      })
+    }).then((data) => {
+      resolve(new MessageBuilder(this.client, data, this.Application))
+    })
   }
 
-  
+
   slice(start, end) {
     if (typeof start !== 'number' || typeof end !== 'number') {
       throw new TypeError('Start and end arguments must be numbers');
@@ -167,7 +170,7 @@ class MessageBuilder extends Message {
     if (start > end) {
       throw new RangeError('Start argument cannot be greater than end argument');
     }
-    
+
     const args = [];
     for (let i = start; i <= end; i++) {
       if (typeof this[i] !== 'undefined') {
@@ -179,24 +182,24 @@ class MessageBuilder extends Message {
 
 };
 
-MessageBuilder.prototype.deferReply = async function() {};
-MessageBuilder.prototype.editReply = async function() {};
-MessageBuilder.prototype.isMessageComponent = async function() {};
-MessageBuilder.prototype.isMessageContextMenuCommand = async function() {};
-MessageBuilder.prototype.isModalSubmit = async function() {};
-MessageBuilder.prototype.isRepliable = async function() {};
-MessageBuilder.prototype.isRoleSelectMenu = async function() {};
-MessageBuilder.prototype.isSelectMenu = async function() {};
-MessageBuilder.prototype.isStringSelectMenu = async function() {};
-MessageBuilder.prototype.isUserContextMenuCommand = async function() {};
-MessageBuilder.prototype.isUserSelectMenu = async function() {};
-MessageBuilder.prototype.isUserSelectMenu = async function() {};
-MessageBuilder.prototype.isButton = async function() {};
-MessageBuilder.prototype.inCachedGuild = async function() {};
-MessageBuilder.prototype.inGuild = async function() {};
-MessageBuilder.prototype.inRawGuild = async function() {};
-MessageBuilder.prototype.isAnySelectMenu = async function() {};
-MessageBuilder.prototype.isAutocomplete = async function() {};
-MessageBuilder.prototype.isChannelSelectMenu = async function() {};
+MessageBuilder.prototype.deferReply = async function () { };
+MessageBuilder.prototype.editReply = async function () { };
+MessageBuilder.prototype.isMessageComponent = async function () { };
+MessageBuilder.prototype.isMessageContextMenuCommand = async function () { };
+MessageBuilder.prototype.isModalSubmit = async function () { };
+MessageBuilder.prototype.isRepliable = async function () { };
+MessageBuilder.prototype.isRoleSelectMenu = async function () { };
+MessageBuilder.prototype.isSelectMenu = async function () { };
+MessageBuilder.prototype.isStringSelectMenu = async function () { };
+MessageBuilder.prototype.isUserContextMenuCommand = async function () { };
+MessageBuilder.prototype.isUserSelectMenu = async function () { };
+MessageBuilder.prototype.isUserSelectMenu = async function () { };
+MessageBuilder.prototype.isButton = async function () { };
+MessageBuilder.prototype.inCachedGuild = async function () { };
+MessageBuilder.prototype.inGuild = async function () { };
+MessageBuilder.prototype.inRawGuild = async function () { };
+MessageBuilder.prototype.isAnySelectMenu = async function () { };
+MessageBuilder.prototype.isAutocomplete = async function () { };
+MessageBuilder.prototype.isChannelSelectMenu = async function () { };
 
 module.exports = MessageBuilder;

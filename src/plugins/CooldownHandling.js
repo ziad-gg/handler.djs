@@ -18,7 +18,7 @@ module.exports = async function (message, Command) {
  const reference = cooldown.reference;
  const long = cooldown.long;
  const send = cooldown.Mdelete? 
- (option) => message.sendTimedMessage(option, cooldown.Mdelete, reference) : 
+ (option) => message.sendTimedMessage(option, typeof cooldown.Mdelete === 'string'? ms(cooldown.Mdelete) : cooldown.Mdelete , reference) : 
  (option) => (reference)? message.reply(option) : message.channel.send(option);
 
  /** @type {Collection} */
