@@ -58,10 +58,13 @@ class InteractionBuilder extends CommandInteraction {
         this.counter = 0;
         /** @type {Array} */
         const options = this.ApiRes.data.options || [];
+        console.log(options)
         for (const art of options) {
             if (art['type'] === 1) {
                 this['SubCommand'] = art.name;
                 this.#readOptions(art.options)
+            } if (art['type'] === 6) {
+                this.#readOptions([art])
             } else {
                 this.#readOptions(art)
             };
@@ -78,6 +81,8 @@ class InteractionBuilder extends CommandInteraction {
     }
 
     #readOptions(options) {
+
+
         if (!Array.isArray(options)) {
             return this[options.name] = options.value
         };

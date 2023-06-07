@@ -4,12 +4,7 @@ const { CommandBuilder, Interaction } = require("../../src");
 module.exports = new CommandBuilder()
 .setName('pp')
 .setDescription('Bot Response Ws')
-.InteractionOn(new SlashCommandBuilder()
-.addStringOption(opt => opt.setName('name').setDescription('Panal embed Title to Create').setRequired(true).setMaxLength(10))
-.addStringOption(opt => opt.setName('description').setDescription('Panal embed Description to Create').setRequired(true))
-.addNumberOption(opt => opt.setName('limit').setDescription('Limit Number Of tickets To open for one User'))
-.addChannelOption(opt => opt.setName('category').setDescription('Category To Open Tickets In'))
-)
+.InteractionOn(new SlashCommandBuilder().addUserOption(op => op.setName('u').setDescription('d')))
 .setInteractionExecution(Execute);
 
 /**
@@ -18,6 +13,6 @@ module.exports = new CommandBuilder()
  */
 
 function Execute (interaction) {
- console.log(interaction['name'])
+ console.log(interaction[0])
  console.log(interaction['description'])
 }
