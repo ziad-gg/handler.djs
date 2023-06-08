@@ -26,10 +26,6 @@ module.exports = async function (client, main) {
 
     let global = null;
 
-    if (Command.global) {
-      global = await Command.global(message);
-      // if (!global.message) throw new Error("Global function must return a value for message Execution");
-    };
 
     const next = await CommandExecuteHandling(message, Command);
 
@@ -40,6 +36,11 @@ module.exports = async function (client, main) {
 
     await ValidationHandling(main, Command, message, next);
     if (await message.isStoped()) return;
+    
+    if (Command.global) {
+      global = await Command.global(message);
+      // if (!global.message) throw new Error("Global function must return a value for message Execution");
+    };
 
     if (global && global.message) {
       Command.run(message, global?.message);

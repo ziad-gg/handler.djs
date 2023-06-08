@@ -1,6 +1,6 @@
-const { CommandInteraction, Client } = require("discord.js");
+const { CommandInteraction, Client } = require('discord.js');
 const Application = require('../structures/Application.js');
-// const MessageBuilder = require('./MessageBuilder.js');
+const extractInteractionOptions = require('../util/extractArguments.js')
 
 class InteractionBuilder extends CommandInteraction {
     constructor(client, ApiInteraction, Application) {
@@ -10,13 +10,9 @@ class InteractionBuilder extends CommandInteraction {
         /** @type {Application} */
         this.Application = Application;
         this.Api = ApiInteraction;
-
         this.prefix = this.Application.prefix;
         this.data = Application.data;
-
         this.stoped = false;
-
-        // this
     };
 
 
@@ -34,8 +30,7 @@ class InteractionBuilder extends CommandInteraction {
                 })
             }
         })
-
-    }
+    };
 
 
 
@@ -54,21 +49,12 @@ class InteractionBuilder extends CommandInteraction {
     };
 
     args() {
-
-        this.counter = 0;
-        /** @type {Array} */
-        const options = this.ApiRes.data.options || [];
-        let opp = [];
-        for (const art of options) {
-            if (art['type'] === 1) {
-                this['SubCommand'] = art.name;
-                this.#readOptions(art.options)
-            } if (art['type'] === 6) {
-                this.#readOptions([art])
-            } else {
-                this.#readOptions(art)
-            };
-        };
+        const InteractionOptions = extractInteractionOptions(this.ApiRes.data.options);
+        for (let i = 0; i < InteractionOptions.length; i++) {
+          const option = InteractionOptions[i]
+          this[i] = option.value;
+          this[options.name] = option.value;
+        }
     };
 
     async getUser(id) {
@@ -78,22 +64,6 @@ class InteractionBuilder extends CommandInteraction {
         if (!User) User = await this.client.users.fetch(id).then(user => user).catch(e => null);
         if (!User) User = await this.guild.members.fetch(id).then(user => user).catch(e => null);
         return User;
-    }
-
-    #readOptions(options) {
-
-        if (!Array.isArray(options)) {
-            return this[options.name] = options.value
-        };
-
-        for (let i = 0; i < options.length; i++) {
-            if (!this[i]) {
-             this[i] = options[i].value;
-             this[options[i].name] = options[i].value;
-            } else {
-             this[options[i].name] = options[i].value;
-            }
-        };
     };
 
     isStoped() {
@@ -108,8 +78,6 @@ class InteractionBuilder extends CommandInteraction {
     getData(key) {
         return this.Application.data.get(key);
     };
-
-
 
     getAttr(key) {
         return this.Command.getAttr(key);

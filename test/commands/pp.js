@@ -13,6 +13,6 @@ module.exports = new CommandBuilder()
  */
 
 function Execute (interaction) {
- console.log(interaction[0])
- console.log(interaction['description'])
+//  console.log(interaction)
+//  console.log(interaction['description'])
 }

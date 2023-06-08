@@ -28,16 +28,16 @@ module.exports = async function (client, main) {
 
     let global = null;
 
-    if (Command.global) {
-      global = await Command.global(undefined, Interaction);
-      // if (!global.interaction) throw new Error("Global function must return a value for interaction Execution");
-    };
-
     await CooldownHandling(Interaction, Command);
     if (await Interaction.isStoped()) return;
 
     await ValidationHandling(main, Command, Interaction, next);
     if (await Interaction.isStoped()) return;
+
+    if (Command.global) {
+      global = await Command.global(undefined, Interaction);
+      // if (!global.interaction) throw new Error("Global function must return a value for interaction Execution");
+    };
 
     if (global && global.interaction) {
       Interaction.Command.interaction(Interaction, global?.interaction);
