@@ -53,7 +53,7 @@ class InteractionBuilder extends CommandInteraction {
         for (let i = 0; i < InteractionOptions.length; i++) {
           const option = InteractionOptions[i]
           this[i] = option.value;
-          this[options.name] = option.value;
+          this[option.name] = option.value;
         }
     };
 
