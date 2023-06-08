@@ -15,20 +15,20 @@ const CommandExecuteHandling = require('./CommandExecuteHandling.js');
 
 module.exports = async function (client, main) {
 
- client.api.on(GatewayDispatchEvents.MessageCreate, async (data) => {
-    
+  client.api.on(GatewayDispatchEvents.MessageCreate, async (data) => {
+
     const message = new MessageBuilder(client, data, main).run();
     if (message.author.bot || !message.startsWithPrefix || !message.isCmd) return;
-    
+
     /** @type {CommandBuilder} */
     const Command = main.getCommand(message.cmdName);
     if (!Command.run) return;
-    
+
     let global = null;
 
     if (Command.global) {
       global = await Command.global(message);
-      if (!global.message) throw new Error("Global function must return a value for message Execution");
+      // if (!global.message) throw new Error("Global function must return a value for message Execution");
     };
 
     const next = await CommandExecuteHandling(message, Command);
@@ -41,7 +41,13 @@ module.exports = async function (client, main) {
     await ValidationHandling(main, Command, message, next);
     if (await message.isStoped()) return;
 
-   Command.run(message, global?.message);
+    if (global && global.message) {
+      Command.run(message, global?.message);
+    } else if (global && !global.message) {
+      return
+    } else if (!global) {
+      Command.run(message, null);
+    }
 
- });
+  });
 }

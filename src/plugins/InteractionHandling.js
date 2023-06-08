@@ -14,9 +14,9 @@ const CommandExecuteHandling = require('./CommandExecuteHandling.js');
 
 module.exports = async function (client, main) {
 
- client.api.on(GatewayDispatchEvents.InteractionCreate, async (data) => {
+  client.api.on(GatewayDispatchEvents.InteractionCreate, async (data) => {
     const Interaction = new InteractionBuilder(client, data, main).run();
-    if (!Interaction.isCmd || ( Interaction.isCmd && !Interaction.Command.int )) return;
+    if (!Interaction.isCmd || (Interaction.isCmd && !Interaction.Command.int)) return;
     Interaction.args();
 
     const Command = main.getCommand(Interaction.cmdName);
@@ -30,7 +30,7 @@ module.exports = async function (client, main) {
 
     if (Command.global) {
       global = await Command.global(undefined, Interaction);
-      if (!global.interaction) throw new Error("Global function must return a value for interaction Execution");
+      // if (!global.interaction) throw new Error("Global function must return a value for interaction Execution");
     };
 
     await CooldownHandling(Interaction, Command);
@@ -39,9 +39,15 @@ module.exports = async function (client, main) {
     await ValidationHandling(main, Command, Interaction, next);
     if (await Interaction.isStoped()) return;
 
-    Interaction.Command.interaction(Interaction, global?.interaction);
+    if (global && global.interaction) {
+      Interaction.Command.interaction(Interaction, global?.interaction);
+    } else if (global && !global.interaction) {
+      return;
+    } else {
+      Interaction.Command.interaction(Interaction, null);
+    }
 
- });
+  });
 
 
 }
