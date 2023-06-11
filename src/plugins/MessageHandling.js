@@ -22,12 +22,20 @@ module.exports = async function (client, main) {
 
     /** @type {CommandBuilder} */
     const Command = main.getCommand(message.cmdName);
-    if (!Command.run) return;
+
+    if (Command.Application.sensitive && Command.OrginName !== message.OrginCmdName) return;
+
+    if (!Command.run && !Command.global) return;
 
     let global = null;
 
-
     const next = await CommandExecuteHandling(message, Command);
+
+    const GroupName = message[0]?.toLowerCase();
+    const GroupChildName = message[1]?.toLowerCase();
+
+    message.GroupName = GroupName;
+    message.GroupChildName = GroupChildName;
 
     if (Command.disabed || (Command.owners && !message.author.isOwner)) return;
 
@@ -36,19 +44,79 @@ module.exports = async function (client, main) {
 
     await ValidationHandling(main, Command, message, next);
     if (await message.isStoped()) return;
-    
+
+    const subs = message.Command.Application.Subs[0];
+
     if (Command.global) {
       global = await Command.global(message);
-      // if (!global.message) throw new Error("Global function must return a value for message Execution");
     };
 
-    if (global && global.message) {
-      Command.run(message, global?.message);
-    } else if (global && !global.message) {
-      return
-    } else if (!global) {
-      Command.run(message, null);
+    // return console.log(message.Command.Application.Subs[0])
+
+    if (subs) {
+      const commandGroup = subs.commandGroup?.toLowerCase();
+      const commandName = subs.commandName?.toLowerCase();
+
+      let args = message.content.slice(main.prefix.length).split(/ +/g)
+      args.shift()
+
+      if (GroupName && GroupChildName && commandGroup && commandName && GroupName === commandGroup && commandName === GroupChildName) args = args.slice(2);
+      if (GroupName === commandName) args = args.slice(1);
+
+      for (const i in args) message[i] = args[i]
+
+      if (GroupName && GroupChildName && commandGroup && commandName && GroupName === commandGroup && commandName === GroupChildName) {
+        const SubCommand = main.getCommand(GroupChildName);
+
+        if (!SubCommand.run) return
+
+        if (global && global.message) {
+
+          SubCommand.run(message, global?.message);
+          message.Command.Child = SubCommand;
+          message.GroupName = GroupName;
+          message.GroupChildName = GroupChildName;
+
+        } else if (global && !global.message) {
+          return
+        } else if (!global) {
+          SubCommand.run(message, null);
+          message.Command.Child = SubCommand;
+          message.GroupName = GroupName;
+          message.GroupChildName = GroupChildName;
+        };
+
+        return;
+
+      } else if (GroupName === commandName) {
+        const SubCommand = main.getCommand(GroupName);
+        if (!SubCommand.run) return;
+        if (global && global.message) {
+          SubCommand.run(message, global?.message);
+          message.Command.Child = SubCommand;
+          message.GroupName = GroupName;
+        } else if (global && !global.message) {
+          return
+        } else if (!global) {
+          SubCommand.run(message, null);
+          message.Command.Child = SubCommand;
+          message.GroupName = GroupName;
+        };
+
+        return;
+
+      }
+    } else {
+      if (global && global.message) {
+        Command.run(message, global?.message);
+      } else if (global && !global.message) {
+        return
+      } else if (!global) {
+        Command.run(message, null);
+      }
     }
+
+
 
   });
 }

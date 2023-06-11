@@ -1,6 +1,7 @@
-const { CommandInteraction, Client } = require('discord.js');
+const { CommandInteraction, Client, Options } = require('discord.js');
 const Application = require('../structures/Application.js');
 const extractInteractionOptions = require('../util/extractArguments.js')
+
 
 class InteractionBuilder extends CommandInteraction {
     constructor(client, ApiInteraction, Application) {
@@ -50,10 +51,23 @@ class InteractionBuilder extends CommandInteraction {
 
     args() {
         const InteractionOptions = extractInteractionOptions(this.ApiRes.data.options);
+
+        const ApiResOptions = this.ApiRes.data?.options?.[0];
+
+        if (ApiResOptions && ApiResOptions.type === 2) {
+            const GroupChildName = ApiResOptions.options[0].name;
+            this.GroupName = ApiResOptions.name;
+            this.GroupChildName = GroupChildName;
+            this.ResponseType = ApiResOptions.type;
+        } else if (ApiResOptions && ApiResOptions.type === 1) {
+            this.GroupName = ApiResOptions.name;
+            this.ResponseType = ApiResOptions.type;
+        }
+
         for (let i = 0; i < InteractionOptions.length; i++) {
-          const option = InteractionOptions[i]
-          this[i] = option.value;
-          this[option.name] = option.value;
+            const option = InteractionOptions[i]
+            this[i] = option.value;
+            this[option.name] = option.value;
         }
     };
 

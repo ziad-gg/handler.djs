@@ -24,6 +24,7 @@ class MessageBuilder extends Message {
 
   #args() {
     const args = (this.content.slice(this.prefix.length).split(/ +/g));
+    this.OrginCmdName = args[0];
     const cmdName = args.shift().toLowerCase();
     for (const i in args) this[i] = args[i];
     return cmdName

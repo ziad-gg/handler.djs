@@ -16,6 +16,7 @@ class CommandBuilder extends Base {
 
     // start Required Properties
     this.name = this.Application.name.toLowerCase();
+    this.OrginName = this.Application.name;
     this.description = this.Application.description;
     this.run = this.Application.run;
     this.interaction = this.Application.interaction;
@@ -42,14 +43,12 @@ class CommandBuilder extends Base {
     this.owners = this.Application.owners ? this.main.owners : null;
     this.disabed = this.Application.disabed ?? false;
     this.category = this.Application.category;
-    // this.    
+    this.isSubcommandOf = this.Application.isSubcommandOf;    
      // start util Properties
 
     this.getAttr = function(key) {
       return this.Application.attr.get(key);
     };
-
- 
      // End util Properties
 
 

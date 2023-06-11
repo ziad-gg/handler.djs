@@ -20,9 +20,16 @@ module.exports = async function (client, main) {
     Interaction.args();
 
     const Command = main.getCommand(Interaction.cmdName);
-    if (!Command.interaction) return;
+    if (!Command.interaction && !Command.global) return;
 
     const next = await CommandExecuteHandling(Interaction, Command);
+
+    const GroupName = Interaction.GroupName;
+    const GroupChildName = Interaction.GroupChildName;
+    const type = Interaction.ResponseType;
+
+    Interaction.GroupName = GroupName;
+    Interaction.GroupChildName = GroupChildName;
 
     if (Command.disabed || (Command.owners && !message.author.isOwner)) return;
 
@@ -36,8 +43,44 @@ module.exports = async function (client, main) {
 
     if (Command.global) {
       global = await Command.global(undefined, Interaction);
-      // if (!global.interaction) throw new Error("Global function must return a value for interaction Execution");
-    };
+    }
+
+    if (type === 2) {
+      const SubCommand = main.getCommand(GroupChildName);
+      if (!SubCommand.interaction) return;
+
+      if (global && global.interaction) {
+        Interaction.Command.Child = SubCommand;
+        Interaction.GroupName = GroupName;
+        Interaction.GroupChildName = GroupChildName;
+        return SubCommand.interaction(Interaction, global.interaction);
+      } else if (global && !global.interaction) {
+        return;
+      } else {
+        Interaction.Command.Child = SubCommand;
+        Interaction.GroupName = GroupName;
+        Interaction.GroupChildName = GroupChildName;
+        return SubCommand.interaction(Interaction, null);
+      };
+
+    }
+
+    if (type === 1) {
+      const SubCommand = main.getCommand(GroupName);
+      if (!SubCommand.interaction) return;
+      
+      if (global && global.interaction) {
+        Interaction.Command.Child = SubCommand;
+        Interaction.GroupName = GroupName;
+        return SubCommand.interaction(Interaction, global.interaction);
+      } else if (global && !global.interaction) {
+        return;
+      } else {
+        Interaction.Command.Child = SubCommand;
+        Interaction.GroupName = GroupName;
+        return SubCommand.interaction(Interaction, null);
+      };
+    }
 
     if (global && global.interaction) {
       Interaction.Command.interaction(Interaction, global?.interaction);
@@ -48,6 +91,5 @@ module.exports = async function (client, main) {
     }
 
   });
-
 
 }

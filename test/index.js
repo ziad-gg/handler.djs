@@ -14,6 +14,12 @@ new Application(client, {
   commandsPath: path.join(__dirname, 'commands'),
 });
 
+client.Application.setCooldown({
+  message: "Cooldown {counter}",
+  reference: true,
+  Mdelete: "3s",
+  once: true,
+});
 
 client.Application.build();
 

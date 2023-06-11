@@ -1,5 +1,6 @@
 function extractInteractionOptions(data) {
   const options = [];
+  if (!data || !Array.isArray(data)) return []
   for (const option of data) {
     const name = option.name;
     let value;

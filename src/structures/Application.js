@@ -36,6 +36,7 @@ class Application extends Base {
     this._patch(this.main, "valids", []);
     this._patch(main, "data", new Collection());
     this._patch(main, "_command$", new Collection());
+    // this._patch(main, "Groups", {})
     this._patch(this.main, "cooldownConfig", {
       message: "**{Username}**, Cool down (**{counter}** left)",
       reference: true,
@@ -107,7 +108,7 @@ class Application extends Base {
       await this._build();
       const commands = await readCommands(this.paths.commandsPath, this.main);
       commands.forEach(cmd => this["_command$"].set(cmd.name.toLowerCase(), cmd));
-      this.interactions = await Register_Commands(this, commands.filter(cmd => cmd.int).map(e => e.builder));
+      this.interactions = await Register_Commands(this, commands.filter(cmd => cmd.int).map(e => e));
 
       this.#plugins();
     });

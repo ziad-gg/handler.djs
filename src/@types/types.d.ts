@@ -1,16 +1,16 @@
-import { PermissionResolvable, Events, Client, Collection, SlashCommandBuilder, ButtonBuilder, ModalBuilder, UserSelectMenuBuilder, StringSelectMenuBuilder } from 'discord.js';
-import { Message, Command, Interaction } from 'handler.djs';
+import { PermissionResolvable, Events, Client, Collection, SlashCommandBuilder, ButtonBuilder, ModalBuilder, UserSelectMenuBuilder, StringSelectMenuBuilder } from 'discord.js'
+import { Message, Command, Interaction } from 'handler.djs'
 
 export interface ApplicationInterface {
-    readonly prefix: string;
-    commands: Collection<string, CommandStructur>;
-    setPrefix(prefix: String): ApplicationInterface;
-    setCooldown({ message, reference, long, Mdelete, once }: ApplicationCooldownConstructor): ApplicationInterface;
-    build(): ApplicationInterface;
-    setData(data: Object): ApplicationInterface;
-    getCommand(name: String): CommandStructur;
-    getData(key: string): any;
-    setCooldownMessage(message: string): ApplicationInterface;
+    readonly prefix: string
+    commands: Collection<string, CommandStructur>
+    setPrefix(prefix: String): ApplicationInterface
+    setCooldown({ message, reference, long, Mdelete, once }: ApplicationCooldownConstructor): ApplicationInterface
+    build(): ApplicationInterface
+    setData(data: Object): ApplicationInterface
+    getCommand(name: String): CommandStructur
+    getData(key: string): any
+    setCooldownMessage(message: string): ApplicationInterface
 }
 
 export interface ApplicationConstructor {
@@ -31,30 +31,33 @@ export interface ApplicationCooldownConstructor {
 }
 
 export interface CommandInterface {
-    setName(name: string): CommandInterface;
-    setDescription(description: String): CommandInterface;
-    setUsage(usage: (Array<string> | string)): CommandInterface;
-    setExample(examples: (Array<string> | string)): CommandInterface;
-    setInteractionExecution(callback: (interaction: Interaction) => void): CommandInterface;
-    setMessageExecution(callback: (message: Message) => void): CommandInterface;
-    setGlobal(): CommandInterface;
+    setName(name: string): CommandInterface
+    setDescription(description: String): CommandInterface
+    setUsage(usage: (Array<string> | string)): CommandInterface
+    setExample(examples: (Array<string> | string)): CommandInterface
+    setInteractionExecution(callback: (interaction: Interaction) => void): CommandInterface
+    setMessageExecution(callback: (message: Message) => void): CommandInterface
+    setGlobal(callback: (message: Message, interaction: Interaction) => void): CommandInterface
     setCooldown(cooldown: (String | Number)): CommandInterface
-    setOwners(owners: Boolean): CommandInterface;
-    setDisabled(disabed: Boolean): CommandInterface;
-    setPermissions(permissions: Array<PermissionResolvable> | PermissionResolvable): CommandInterface;
-    setCategory(name: String): CommandInterface;
-    setAttr(key: string, value: string): CommandInterface;
-    InteractionOn(cmd: SlashCommandBuilder): CommandInterface;
+    OwnersOnly(): CommandInterface
+    isSensitive(): CommandInterface
+    isSubCommand(): CommandInterface
+    setSubcommands(options: Array<{ command: (string | CommandInterface), commandGroup?: string, description?: string, sensitive?: Boolean }> ): CommandInterface
+    setSubGroupName(name: string): CommandInterface
+    setDisabled(disabed: Boolean): CommandInterface
+    setCategory(name: String): CommandInterface
+    setAttr(key: string, value: string): CommandInterface
+    InteractionOn(cmd: SlashCommandBuilder): CommandInterface
 }
 
 export interface OptionInterface {
-    setName(name: string): OptionInterface;
+    setName(name: string): OptionInterface
     setRequired(): OptionInterface
 }
 
 export interface ValidationInterface {
-    setCommnads(commands: (Array<string> | string)): ValidationInterface;
-    setExecution(executionFunction: Function): ValidationInterface;
+    setCommnads(commands: (Array<string> | string)): ValidationInterface
+    setExecution(executionFunction: Function): ValidationInterface
 }
 
 export interface CommandStructur {
@@ -73,9 +76,9 @@ export interface CommandStructur {
 }
 
 export interface EventBuilderInterface {
-    setEvent(name: Events): EventBuilderInterface;
-    setExecution(func: Function): EventBuilderInterface;
-    once(value: Boolean): EventBuilderInterface;
+    setEvent(name: Events): EventBuilderInterface
+    setExecution(func: Function): EventBuilderInterface
+    once(value: Boolean): EventBuilderInterface
     setType(Type: Array<ButtonBuilder | ModalBuilder | StringSelectMenuBuilder | UserSelectMenuBuilder>): EventBuilderInterface
 
 }
