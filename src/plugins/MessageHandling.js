@@ -45,15 +45,22 @@ module.exports = async function (client, main) {
     await ValidationHandling(main, Command, message, next);
     if (await message.isStoped()) return;
 
-    const subs = message.Command.Application.Subs[0];
+    /** @type {Array<{ commandGroup: string, commandName: string }>} */
+    const SubCommandDecleration = message.Command.Application.Subs
+
+    let subs =  SubCommandDecleration?.find(sub => sub.commandGroup?.toLowerCase() === GroupName &&  (GroupChildName ? sub.commandName === GroupChildName : true) );
+    if (!subs) subs = SubCommandDecleration.find(op => op.commandName.toLowerCase() === GroupName && !op.commandGroup);
+
+    if (SubCommandDecleration.length > 0 && !subs) return;
 
     if (Command.global) {
       global = await Command.global(message);
     };
 
-    // return console.log(message.Command.Application.Subs[0])
+    if (await message.isStoped()) return;
 
     if (subs) {
+
       const commandGroup = subs.commandGroup?.toLowerCase();
       const commandName = subs.commandName?.toLowerCase();
 
@@ -63,27 +70,62 @@ module.exports = async function (client, main) {
       if (GroupName && GroupChildName && commandGroup && commandName && GroupName === commandGroup && commandName === GroupChildName) args = args.slice(2);
       if (GroupName === commandName) args = args.slice(1);
 
-      for (const i in args) message[i] = args[i]
+      if (args.length > 0) {
+        for (const i in args) message[i] = args[i]; 
+      } else {
+        for (let i = 0; i <= 10; i++) {
+          message[i] = undefined;
+          message[i.toString()] = undefined;
+        }
+      };
 
       if (GroupName && GroupChildName && commandGroup && commandName && GroupName === commandGroup && commandName === GroupChildName) {
+
         const SubCommand = main.getCommand(GroupChildName);
 
         if (!SubCommand.run) return
 
         if (global && global.message) {
 
-          SubCommand.run(message, global?.message);
           message.Command.Child = SubCommand;
           message.GroupName = GroupName;
           message.GroupChildName = GroupChildName;
+          let subGlobal
+
+          if (SubCommand.global) {
+            subGlobal = await SubCommand.global(message, undefined, global.message);
+          }
+
+          if (subGlobal && subGlobal.message) {
+            SubCommand.run(message, subGlobal?.message);
+          } else if (subGlobal && !subGlobal.message) {
+            return
+          } else if (!subGlobal) {
+            SubCommand.run(message, null);
+          };
+
 
         } else if (global && !global.message) {
           return
         } else if (!global) {
-          SubCommand.run(message, null);
+
           message.Command.Child = SubCommand;
           message.GroupName = GroupName;
           message.GroupChildName = GroupChildName;
+          let subGlobal
+
+          if (SubCommand.global) {
+            subGlobal = await SubCommand.global(message);
+          }
+
+          if (subGlobal && subGlobal.message) {
+            SubCommand.run(message, subGlobal?.message);
+          } else if (subGlobal && !subGlobal.message) {
+            return
+          } else if (!subGlobal) {
+            SubCommand.run(message, null);
+          };
+
         };
 
         return;
@@ -92,15 +134,40 @@ module.exports = async function (client, main) {
         const SubCommand = main.getCommand(GroupName);
         if (!SubCommand.run) return;
         if (global && global.message) {
-          SubCommand.run(message, global?.message);
           message.Command.Child = SubCommand;
           message.GroupName = GroupName;
+          let subGlobal
+
+          if (SubCommand.global) {
+            subGlobal = await SubCommand.global(message);
+          }
+
+          if (subGlobal && subGlobal.message) {
+            SubCommand.run(message, subGlobal?.message);
+          } else if (subGlobal && !subGlobal.message) {
+            return
+          } else if (!subGlobal) {
+            SubCommand.run(message, null);
+          };
+
         } else if (global && !global.message) {
           return
         } else if (!global) {
-          SubCommand.run(message, null);
           message.Command.Child = SubCommand;
           message.GroupName = GroupName;
+          let subGlobal
+
+          if (SubCommand.global) {
+            subGlobal = await SubCommand.global(message);
+          }
+
+          if (subGlobal && subGlobal.message) {
+            SubCommand.run(message, subGlobal?.message);
+          } else if (subGlobal && !subGlobal.message) {
+            return
+          } else if (!subGlobal) {
+            SubCommand.run(message, null);
+          };
         };
 
         return;
@@ -108,14 +175,15 @@ module.exports = async function (client, main) {
       }
     } else {
       if (global && global.message) {
+        if (!Command.run) return
         Command.run(message, global?.message);
       } else if (global && !global.message) {
         return
       } else if (!global) {
+        if (!Command.run) return
         Command.run(message, null);
       }
     }
-
 
 
   });

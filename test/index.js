@@ -18,7 +18,8 @@ client.Application.setCooldown({
   message: "Cooldown {counter}",
   reference: true,
   Mdelete: "3s",
-  once: true,
+  EphemeralReply: false,
+  once: false,
 });
 
 client.Application.build();

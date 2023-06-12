@@ -29,7 +29,9 @@ class CommandBuilder extends Base {
     this.examples = this.Application.examples || [this.name];
     this.permissions = this.Application.permissions || ["SendMessages"];
     this.int = this.Application.int;
-
+    this.SubCommands = this.Application.Subs;
+    this.isSensitive = this.Application.sensitive;
+    this.isSubCommand = this.Application.isSub ? true : false;
      // start Cooldown Config
     this.cooldown.status = this.Application.cooldown && this.main.cooldownConfig ? "on" : "off";
     this.cooldown.timer = this.Application.cooldown || 1;
@@ -48,6 +50,10 @@ class CommandBuilder extends Base {
 
     this.getAttr = function(key) {
       return this.Application.attr.get(key);
+    };
+
+    this.setAttr = function(key, value) {
+      return this.Application.attr.set(key, value);
     };
      // End util Properties
 

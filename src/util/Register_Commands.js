@@ -39,5 +39,6 @@ module.exports = async function (Application, cmds) {
 
   const Allcommands = MainCommands.map(cmd => cmd.builder);
 
+  // console.log(Allcommands)
   await Application.REST_API.REST.put(Application.REST_API.Routes.applicationCommands(Application.client.user.id), { body: Allcommands });
 };

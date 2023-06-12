@@ -1,6 +1,6 @@
 {
   "name": "handler.djs",
-  "version": "2.5.8",
+  "version": "2.6.2",
   "description": "A package to manage all discord bot Files",
   "types": "src/@types/index.d.ts",
   "author": "Ziath#1768 <zemad3040@gmail.com>",

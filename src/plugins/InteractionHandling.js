@@ -31,7 +31,7 @@ module.exports = async function (client, main) {
     Interaction.GroupName = GroupName;
     Interaction.GroupChildName = GroupChildName;
 
-    if (Command.disabed || (Command.owners && !message.author.isOwner)) return;
+    if (Command.disabed || (Command.owners && !Interaction.author.isOwner)) return;
 
     let global = null;
 
@@ -45,6 +45,9 @@ module.exports = async function (client, main) {
       global = await Command.global(undefined, Interaction);
     }
 
+    if (await Interaction.isStoped()) return;
+
+
     if (type === 2) {
       const SubCommand = main.getCommand(GroupChildName);
       if (!SubCommand.interaction) return;
@@ -53,32 +56,88 @@ module.exports = async function (client, main) {
         Interaction.Command.Child = SubCommand;
         Interaction.GroupName = GroupName;
         Interaction.GroupChildName = GroupChildName;
-        return SubCommand.interaction(Interaction, global.interaction);
+        let subGlobal
+
+        if (SubCommand.global) {
+          subGlobal = await SubCommand.global(undefined, Interaction, global.interaction);
+        }
+
+        if (subGlobal && subGlobal.interaction) {
+          SubCommand.interaction(Interaction, subGlobal?.interaction);
+        } else if (subGlobal && !subGlobal.message) {
+          return
+        } else if (!subGlobal) {
+          SubCommand.interaction(Interaction, null);
+        };
+
+        // return SubCommand.interaction(Interaction, global.interaction);
       } else if (global && !global.interaction) {
         return;
       } else {
         Interaction.Command.Child = SubCommand;
         Interaction.GroupName = GroupName;
         Interaction.GroupChildName = GroupChildName;
-        return SubCommand.interaction(Interaction, null);
+        let subGlobal
+
+        if (SubCommand.global) {
+          subGlobal = await SubCommand.global(undefined, Interaction, null);
+        }
+
+        if (subGlobal && subGlobal.interaction) {
+          SubCommand.interaction(Interaction, subGlobal?.interaction);
+        } else if (subGlobal && !subGlobal.message) {
+          return
+        } else if (!subGlobal) {
+          SubCommand.interaction(Interaction, null);
+        };
+
+        // return SubCommand.interaction(Interaction, null);
       };
 
+      return
     }
 
     if (type === 1) {
       const SubCommand = main.getCommand(GroupName);
       if (!SubCommand.interaction) return;
-      
+
       if (global && global.interaction) {
         Interaction.Command.Child = SubCommand;
         Interaction.GroupName = GroupName;
-        return SubCommand.interaction(Interaction, global.interaction);
+        let subGlobal
+
+        if (SubCommand.global) {
+          subGlobal = await SubCommand.global(undefined, Interaction, global.interaction);
+        }
+
+        if (subGlobal && subGlobal.interaction) {
+          SubCommand.interaction(Interaction, subGlobal?.interaction);
+        } else if (subGlobal && !subGlobal.message) {
+          return
+        } else if (!subGlobal) {
+          SubCommand.interaction(Interaction, null);
+        };
+        
+        return 
       } else if (global && !global.interaction) {
         return;
       } else {
         Interaction.Command.Child = SubCommand;
         Interaction.GroupName = GroupName;
-        return SubCommand.interaction(Interaction, null);
+        let subGlobal
+
+        if (SubCommand.global) {
+          subGlobal = await SubCommand.global(undefined, Interaction, null);
+        }
+
+        if (subGlobal && subGlobal.interaction) {
+          SubCommand.interaction(Interaction, subGlobal?.interaction);
+        } else if (subGlobal && !subGlobal.message) {
+          return
+        } else if (!subGlobal) {
+          SubCommand.interaction(Interaction, null);
+        };
+        return 
       };
     }
 

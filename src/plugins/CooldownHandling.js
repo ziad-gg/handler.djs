@@ -1,49 +1,62 @@
 const { Collection } = require('discord.js');
 const ms = require('ms');
 const MessageBuilder = require('../managers/MessageBuilder.js');
-const CooldownMessageFormator = require('../util/CooldownMessageFormate.js');
+const CooldownMessageFormatter = require('../util/CooldownMessageFormate.js');
 
 /**
- * 
- * @param {MessageBuilder} message 
+ * Handle command cooldown
+ * @param {MessageBuilder} message - The message object
+ * @param {object} Command - The command object
  */
+module.exports = async function handleCommandCooldown(message, Command) {
+  const { cooldown } = Command;
 
-module.exports = async function (message, Command) {
- if (Command.cooldown.status === "oof") return;
- const key = `${message.author.id}-${message.guild.id}`;
- const cooldown = Command.cooldown;
- const time = cooldown.timer;
- const cooldownMessage = message.Application.cooldownConfig?.message;
- const onceReply = message.Application.cooldownConfig.once;
- const reference = cooldown.reference;
- const long = cooldown.long;
- const send = cooldown.Mdelete? 
- (option) => message.sendTimedMessage(option, typeof cooldown.Mdelete === 'string'? ms(cooldown.Mdelete) : cooldown.Mdelete , reference) : 
- (option) => (reference)? message.reply(option) : message.channel.send(option);
+  if (cooldown.status === 'oof') return;
 
- /** @type {Collection} */
- const data = cooldown.cdCollection;
- const keyData = data.get(key);
+  const key = `${message.author.id}-${message.guild.id}`;
+  const { timer, reference, long, Mdelete, EphemeralReply } = cooldown;
+  const cooldownMessage = message.Application.cooldownConfig?.message;
+  const onceReply = message.Application.cooldownConfig.once;
 
- if (keyData) {
-  if (keyData.reply && onceReply) return message.stop();
-  const Timer = ms(Date.now() - keyData.ms, { long });
+  const send = Mdelete
+    ? (option) => message.sendTimedMessage(option, typeof Mdelete === 'string' ? ms(Mdelete) : Mdelete, reference)
+    : (option) => (reference ? message.reply(option) : message.channel.send(option));
 
-  await send({
-    content: await CooldownMessageFormator(cooldownMessage, message, Timer), 
-    ephemeral: cooldown.EphemeralReply || true
-  }).then(() => {
-    keyData.reply = true;
-    data.set(key, keyData);
-    message.stop();
-  });
+  const data = cooldown.cdCollection;
+  let keyData = data.get(key);
 
-  return 0
+  if (keyData) {
+    if (keyData.reply && onceReply) return message.stop();
 
- } else {
-     if (!Command.main.owners.includes(message.author.id)) {
-       data.set(key, { ms: Date.now() + time, reply: false });
-       setTimeout(() => data.delete(key), time);
-     };
- };
-}
+    const timeDifference = Date.now() - keyData.ms;
+    if (timeDifference < 0 || timeDifference > timer) {
+      // Cooldown has expired, delete the existing cooldown data
+      data.delete(key);
+      keyData = null;
+    }
+  }
+
+  if (keyData) {
+    const timerDuration = timer - (Date.now() - keyData.ms);
+    const Timer = ms(timerDuration, { long });
+
+    await send({
+      content: await CooldownMessageFormatter(cooldownMessage, message, Timer),
+      ephemeral: EphemeralReply || true,
+    }).then(() => {
+      keyData.reply = true;
+      data.set(key, keyData);
+      message.stop();
+    });
+
+    return 0;
+  } else {
+    if (!Command.main.owners.includes(message.author.id)) {
+      data.set(key, { ms: Date.now(), reply: false });
+      setTimeout(() => {
+        data.delete(key);
+        // console.log(`Cooldown data deleted for key: ${key}`);
+      }, timer);
+    }
+  }
+};

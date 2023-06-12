@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { CommandBuilder, Interaction } = require('handler.djs');
+const { CommandBuilder, Interaction } = require('../../src');
 
 module.exports = new CommandBuilder()
 .setName('Set')
@@ -8,7 +8,13 @@ module.exports = new CommandBuilder()
 .setCooldown("5s")
 .setGlobal(GlobalExecute)
 .isSensitive()
-.setSubcommands([ {command: 'delete', commandGroup: 'user'} ])
+.setSubcommands([ 
+  {command: 'delete' }, 
+  {command: 'delete', group: 'user'}, 
+  {command: 'edit', group: 'user'},
+  {command: 'delete', group: 'admin'}, 
+  {command: 'edit', group: 'admin'},
+])
 
 
 /**
@@ -17,8 +23,9 @@ module.exports = new CommandBuilder()
  */
 
 async function GlobalExecute(message, interaction) {
+  // message.reply({ content: "Must be Error" })
   return {
-    interaction: "Hello World From Parent",
-    message: "Hello World Too"
+    interaction: "Hello World From Parent To Interaction",
+    message: "Hello World From Parent To Message"
   }
 };

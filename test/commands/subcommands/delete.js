@@ -6,21 +6,25 @@ module.exports = new CommandBuilder()
 .setName('delete')
 .setDescription('delete a User in the database')
 .InteractionOn(new SlashCommandBuilder())
+// .setGlobal(Global)
 .setMessageExecution(Message)
-.setInteractionExecution(Execute)
+.setInteractionExecution(Interaction)
 .isSubCommand();
 
-/**
- * 
- * @param {import("discord.js").Interaction} interaction 
- */
+function Global (message, interaction, global) {
 
-function Message(message, global) {
-  console.log(message[0])
+  return {
+    interaction: true,
+    message: true
+  }
+}
+
+function Message (message, global) {
+  console.log(global)
   message.reply({ content: "Hello World From Child" })
 }
 
-async function Execute(interaction, global) {
-  await interaction.reply({ content: global });
-  interaction.followUp({ content: "Hello World From Child" })
+async function Interaction (interaction, global) {
+  console.log(global)
+  interaction.replyNoMention({ content: "Hello World From Child" })
 }

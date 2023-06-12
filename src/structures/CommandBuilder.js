@@ -60,7 +60,7 @@ class Command extends Base {
     this._patch(this, 'sensitive', true);
     return this;
   };
-  
+
   setDisabled(disabled) {
     if (typeof disabled !== "boolean") throw new Error(`Command disabled must be a boolean. Received: ${typeof disabled}`);
     this._patch(this, "disabled", disabled);
@@ -109,7 +109,7 @@ class Command extends Base {
   };
 
   isSubCommand() {
-    if (this.global) throw new Error('Command which is a sub command cannot have a global execution in it');
+    // if (this.global) throw new Error('Command which is a sub command cannot have a global execution in it');
     this._patch(this, 'isSub', true);
     return this;
   };
@@ -117,7 +117,7 @@ class Command extends Base {
   mergeCommands(...subcommands) {
 
     let _do = false
-    const Group = new SlashCommandSubcommandGroupBuilder();
+    let Group = new SlashCommandSubcommandGroupBuilder();
 
     if (!this.int) {
       throw new Error("Subcommands can only be merged for slash commands. Please use InteractionOn() to enable slash command mode.");
@@ -140,10 +140,30 @@ class Command extends Base {
       const SubGroup = Object.assign(new SlashCommandSubcommandBuilder(), subcommand.builder);
 
       if (subcommand.Application.GroupName) {
-        Group.setDescription(this.description || subcommand.description);
-        Group.setName(subcommand.Application.GroupName);
-        Group.addSubcommand(SubGroup);
+
+        const oldOption = this.builder.options.find(op => op.name === subcommand.Application.GroupName);
+       
+        if (!oldOption) {
+          Group.setDescription(this.description || subcommand.description);
+          Group.setName(subcommand.Application.GroupName);
+          Group.addSubcommand(SubGroup);
+        } else {
+          this.builder.options = this.builder.options.filter(op => op.name !== subcommand.Application.GroupName);
+         
+          Group.setName(subcommand.Application.GroupName);
+          Group.setDescription(this.description || subcommand.description);
+          oldOption.addSubcommand(SubGroup)
+
+          Group = oldOption
+          // Group.addSubcommand(SubGroup);
+          // Group.addSubcommandGroup(oldOption);
+
+          // console.log(oldOption)
+
+        }
+
         _do = true
+
       } else {
         this.builder.addSubcommand(SubGroup);
       };
@@ -173,7 +193,7 @@ class Command extends Base {
       if (!set.command) {
         throw new Error('Each set must have command Builer or commmand Name.');
       }
-     
+
       if (typeof set.command !== 'string' && !(set.command instanceof Command)) {
         throw new Error('Set must have command Name or command Builer.');
       }
@@ -184,12 +204,12 @@ class Command extends Base {
 
       if (typeof set.command === 'string') {
 
-         this.Subs.push({
-           commandName: set.command,
-           commandGroup: set.group,
-           commandDescription: set.description,
-           sensitive: set.sensitive
-         });
+        this.Subs.push({
+          commandName: set.command,
+          commandGroup: set.group,
+          commandDescription: set.description,
+          sensitive: set.sensitive
+        });
 
       } else if (set.command instanceof Command) {
         this.Subs.push({
@@ -214,7 +234,7 @@ class Command extends Base {
   };
 
   setGlobal(executionFunction) {
-    if (this.isSub) throw new Error('Command which is a sub command cannot have a global execution in it');
+    // if (this.isSub) throw new Error('Command which is a sub command cannot have a global execution in it');
     if (!executionFunction || typeof executionFunction !== 'function') throw new Error('Global execution must be required');
     this._patch(this, "global", executionFunction);
     return this;
