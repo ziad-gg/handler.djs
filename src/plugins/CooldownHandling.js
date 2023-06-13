@@ -13,7 +13,7 @@ module.exports = async function handleCommandCooldown(message, Command) {
 
   if (cooldown.status === 'oof') return;
 
-  const key = `${message.author.id}-${message.guild.id}`;
+  const key = `${message.author.id}-${message?.guild?.id ?? 'DM'}`;
   const { timer, reference, long, Mdelete, EphemeralReply } = cooldown;
   const cooldownMessage = message.Application.cooldownConfig?.message;
   const onceReply = message.Application.cooldownConfig.once;

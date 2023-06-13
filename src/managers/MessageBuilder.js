@@ -20,7 +20,28 @@ class MessageBuilder extends Message {
     this.api = this.Application.REST_API;
     /** @type {REST} */
     this.REST = this.api.REST;
+ 
+
+    this.channelId = ApiMessage.channel_id;
+
+    // const channel = this.client.channels.cache.get(this.channelId);
+
+    // channel.send({ content: "Hello World" })
+    // console.log(channel.type === ChannelType.DM);
+
+    // console.log(this.client.channels.cache)
+    // console.log()
+    // ChannelType.DM
+    // this.client.options.get
+    // console.log(ApiMessage.channel_id)
+    // this.channelManager = new ChannelManager(this.client);
+    // this.channelManager.cache.set(this.channelId, 'message');
+
+  
+    // console.log(this.channelManager.cache)
   }
+
+
 
   #args() {
     const args = (this.content.slice(this.prefix.length).split(/ +/g));
@@ -90,7 +111,7 @@ class MessageBuilder extends Message {
 
       options.message_reference = {
         message_id: this.id,
-        guild_id: this.guild.id,
+        guild_id: this?.guild?.id,
         channel_id: this.channel.id,
         fail_if_not_exists: true
       };
@@ -98,7 +119,7 @@ class MessageBuilder extends Message {
       this.REST.post(Routes.channelMessages(this.channel.id), { body: options }).then(data => {
         this.replid = {
           message_id: data.id,
-          guild_id: this.guild.id,
+          guild_id: this?.guild?.id,
           channel_id: this.channel.id,
           fail_if_not_exists: true,
         };
@@ -115,7 +136,7 @@ class MessageBuilder extends Message {
 
       options.message_reference = {
         message_id: this.id,
-        guild_id: this.guild.id,
+        guild_id: this.guild?.id,
         channel_id: this.channel.id,
         fail_if_not_exists: true
       };
@@ -127,7 +148,7 @@ class MessageBuilder extends Message {
       this.REST.post(Routes.channelMessages(this.channel.id), { body: options }).then(data => {
         this.replid = {
           message_id: data.id,
-          guild_id: this.guild.id,
+          guild_id: this.guild?.id,
           channel_id: this.channel.id,
           fail_if_not_exists: true,
         };
@@ -154,9 +175,7 @@ class MessageBuilder extends Message {
     return new Promise((resolve, reject) => {
       const Routes = this.api.Routes;
       options['Content-Type'] = 'application/json';
-      this.REST.patch(Routes.channelMessage(this.channel.id, this.id), { body: options })
-    }).then((data) => {
-      resolve(new MessageBuilder(this.client, data, this.Application))
+      this.REST.patch(Routes.channelMessage(this.channel.id, this.id), { body: options }).then(data => resolve(new MessageBuilder(this.client, data, this.Application)));
     })
   }
 
