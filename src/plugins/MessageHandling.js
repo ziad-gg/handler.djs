@@ -20,10 +20,11 @@ module.exports = async function (client, main) {
     const message = new MessageBuilder(client, data, main).run();
     if (message.author.bot || !message.startsWithPrefix || !message.isCmd) return;
 
+
     /** @type {CommandBuilder} */
     const Command = main.getCommand(message.cmdName);
 
-    if (Command.Application.sensitive && Command.OrginName !== message.OrginCmdName) return;
+    if (!message.commandFromCut && Command.Application.sensitive && Command.OrginName !== message.OrginCmdName) return;
 
     if (!Command.run && !Command.global) return;
 
@@ -46,12 +47,16 @@ module.exports = async function (client, main) {
     if (await message.isStoped()) return;
 
     /** @type {Array<{ commandGroup: string, commandName: string }>} */
-    const SubCommandDecleration = message.Command.Application.Subs
+    const SubCommandDecleration = message.Command.Application.Subs;
+
+    console.log(GroupName, GroupChildName)
+
 
     let subs =  SubCommandDecleration?.find(sub => sub.commandGroup?.toLowerCase() === GroupName &&  (GroupChildName ? sub.commandName === GroupChildName : true) );
     if (!subs) subs = SubCommandDecleration.find(op => op.commandName.toLowerCase() === GroupName && !op.commandGroup);
 
     if (SubCommandDecleration.length > 0 && !subs) return;
+
 
     if (Command.global) {
       global = await Command.global(message);
@@ -115,7 +120,7 @@ module.exports = async function (client, main) {
           let subGlobal
 
           if (SubCommand.global) {
-            subGlobal = await SubCommand.global(message);
+            subGlobal = await SubCommand.global(message, undefined, global?.message);
           }
 
           if (subGlobal && subGlobal.message) {
@@ -139,7 +144,7 @@ module.exports = async function (client, main) {
           let subGlobal
 
           if (SubCommand.global) {
-            subGlobal = await SubCommand.global(message);
+            subGlobal = await SubCommand.global(message, undefined, global?.message);
           }
 
           if (subGlobal && subGlobal.message) {
@@ -158,7 +163,7 @@ module.exports = async function (client, main) {
           let subGlobal
 
           if (SubCommand.global) {
-            subGlobal = await SubCommand.global(message);
+            subGlobal = await SubCommand.global(message, undefined, global?.message);
           }
 
           if (subGlobal && subGlobal.message) {

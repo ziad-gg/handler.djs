@@ -50,7 +50,7 @@ module.exports = async function (client, main) {
 
     if (type === 2) {
       const SubCommand = main.getCommand(GroupChildName);
-      if (!SubCommand.interaction) return;
+      if (!SubCommand?.interaction) return;
 
       if (global && global.interaction) {
         Interaction.Command.Child = SubCommand;
@@ -99,7 +99,7 @@ module.exports = async function (client, main) {
 
     if (type === 1) {
       const SubCommand = main.getCommand(GroupName);
-      if (!SubCommand.interaction) return;
+      if (!SubCommand?.interaction) return;
 
       if (global && global.interaction) {
         Interaction.Command.Child = SubCommand;

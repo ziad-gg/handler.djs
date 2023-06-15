@@ -8,8 +8,12 @@ module.exports = new CommandBuilder()
 .setCooldown("5s")
 .setGlobal(GlobalExecute)
 .isSensitive()
+.setAliases([ 
+  { cut: 's' } 
+])
 .setSubcommands([ 
   {command: 'delete' }, 
+  {command: 'edit' }, 
   {command: 'delete', group: 'user'}, 
   {command: 'edit', group: 'user'},
   {command: 'delete', group: 'admin'}, 

@@ -45,6 +45,7 @@ class Application extends Base {
       EphemeralReply: true,
       once: false
     }, true);
+    
     this.commands = this["_command$"];
     this.owners = owners;
     client.Application = this;

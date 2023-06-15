@@ -20,35 +20,31 @@ class MessageBuilder extends Message {
     this.api = this.Application.REST_API;
     /** @type {REST} */
     this.REST = this.api.REST;
- 
+
 
     this.channelId = ApiMessage.channel_id;
 
-    // const channel = this.client.channels.cache.get(this.channelId);
-
-    // channel.send({ content: "Hello World" })
-    // console.log(channel.type === ChannelType.DM);
-
-    // console.log(this.client.channels.cache)
-    // console.log()
-    // ChannelType.DM
-    // this.client.options.get
-    // console.log(ApiMessage.channel_id)
-    // this.channelManager = new ChannelManager(this.client);
-    // this.channelManager.cache.set(this.channelId, 'message');
-
-  
-    // console.log(this.channelManager.cache)
   }
 
 
+  /**
+   * 
+   * @param {Boolean} userPrefix 
+   * @param {string[]} args 
+   * @returns {string | MessageBuilder}
+   */
 
-  #args() {
-    const args = (this.content.slice(this.prefix.length).split(/ +/g));
-    this.OrginCmdName = args[0];
-    const cmdName = args.shift().toLowerCase();
-    for (const i in args) this[i] = args[i];
-    return cmdName
+  #args(userPrefix = true, args) {
+    if (!userPrefix) {
+      for (const i in args) this[i] = args[i];
+      return this;
+    } else {
+      args = (this.content.slice(this.prefix.length).split(/ +/g));
+      this.OrginCmdName = args[0];
+      const cmdName = args.shift().toLowerCase();
+      for (const i in args) this[i] = args[i];
+      return cmdName
+    };
   }
 
   async getUser(id) {
@@ -78,14 +74,32 @@ class MessageBuilder extends Message {
   }
 
   run() {
-    this.startsWithPrefix = this.content.includes(this.prefix);
-    this.cmdName = this.#args();
-    this.isCmd = this.Application.getCommand(this.cmdName) ? true : false;
-    this.author.isOwner = this.Application.owners.includes(this.author.id);
-    /** @type {import('handler.djs/src/@types/types.js').CommandStructur} */
-    this.Command = this.Application.getCommand(this.cmdName);
-    this.replid = null;
-    return this
+    const args = this.content.split(/ +/g);
+    const cutName = args.shift();
+    const CommandFromCut = this.Application.commands.find(cmd => cmd.Application.Cuts.get(cutName.toLowerCase()));
+   
+    if (CommandFromCut) {
+      this.startsWithPrefix = true;
+      this.commandFromCut = true;
+      this.cmdName = CommandFromCut.name;
+      this.cutName = cutName
+      this.isCmd = this.Application.getCommand(this.cmdName) ? true : false;
+      this.Command = this.Application.getCommand(this.cmdName);
+      this.replid = null;
+      this.#args(false, args);
+      return this;
+    } else {
+      this.startsWithPrefix = this.content.includes(this.prefix);
+      this.cmdName = this.#args();
+      this.isCmd = this.Application.getCommand(this.cmdName) ? true : false;
+      this.author.isOwner = this.Application.owners.includes(this.author.id);
+      /** @type {import('handler.djs/src/@types/types.js').CommandStructur} */
+      this.Command = this.Application.getCommand(this.cmdName);
+      this.replid = null;
+
+      return this
+    };
+
   }
 
   async isStoped() {
@@ -136,7 +150,7 @@ class MessageBuilder extends Message {
 
       options.message_reference = {
         message_id: this.id,
-        guild_id: this.guild?.id,
+        guild_id: this?.guild?.id,
         channel_id: this.channel.id,
         fail_if_not_exists: true
       };
@@ -178,7 +192,6 @@ class MessageBuilder extends Message {
       this.REST.patch(Routes.channelMessage(this.channel.id, this.id), { body: options }).then(data => resolve(new MessageBuilder(this.client, data, this.Application)));
     })
   }
-
 
   slice(start, end) {
     if (typeof start !== 'number' || typeof end !== 'number') {

@@ -7,6 +7,7 @@ class Command extends Base {
     super();
     this.int = false;
     this._patch(this, "attr", new Collection());
+    this._patch(this, "Cuts", new Collection())
     this._patch(this, "Subs", []);
   };
 
@@ -84,6 +85,39 @@ class Command extends Base {
     return this;
   };
 
+
+
+  /**
+  * 
+  * @param {{ cut: string, prefix: (Boolean | string), sensitive: Boolean  }[]} Aliases 
+  * @returns {Command}
+  */
+  setAliases(Aliases = { cut: undefined, sensitive: false }) {
+    for (const AliasGroup of Aliases) {
+
+      if (!AliasGroup.cut) {
+        throw new Error("Aliases cut name is not Found");
+      };
+
+      if (!this.name) {
+        throw new Error("Command name must be seted first")
+      };
+      
+      if (AliasGroup.sensitive && typeof AliasGroup.sensitive !== 'boolean') {
+        throw new Error("sensitive must be a Boolean only")
+      };
+
+      this.Cuts.set(AliasGroup.cut.toLowerCase(), {
+        sensitive: AliasGroup.sensitive,
+        cmdName: this.name,
+        cutName: AliasGroup.cut.toLowerCase(),
+        sensitiveName: AliasGroup.sensitive? AliasGroup.cut : AliasGroup.cut.toLowerCase()
+      })
+
+    }
+    return this;
+  }
+
   setAttr(key, value) {
     this.attr.set(key, value);
     return this;
@@ -96,7 +130,7 @@ class Command extends Base {
   /**
    * 
    * @param {SlashCommandBuilder} SlashCommandstructure 
-   * @returns 
+   * @returns { Command }
    */
 
   InteractionOn(SlashCommandstructure) {
@@ -142,14 +176,14 @@ class Command extends Base {
       if (subcommand.Application.GroupName) {
 
         const oldOption = this.builder.options.find(op => op.name === subcommand.Application.GroupName);
-       
+
         if (!oldOption) {
           Group.setDescription(this.description || subcommand.description);
           Group.setName(subcommand.Application.GroupName);
           Group.addSubcommand(SubGroup);
         } else {
           this.builder.options = this.builder.options.filter(op => op.name !== subcommand.Application.GroupName);
-         
+
           Group.setName(subcommand.Application.GroupName);
           Group.setDescription(this.description || subcommand.description);
           oldOption.addSubcommand(SubGroup)
