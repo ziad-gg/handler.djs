@@ -1,4 +1,4 @@
-const { Client, Partials } = require('discord.js');
+const { Client, Partials, Events } = require('discord.js');
 const { Application } = require('../src');
 const path = require('node:path');
 require('dotenv').config();

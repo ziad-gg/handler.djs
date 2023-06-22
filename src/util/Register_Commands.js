@@ -7,8 +7,6 @@ module.exports = async function (Application, cmds) {
   // const MainCommandsBuildersArray = [];
   // const Commands = [];
 
-
-
   const MainCommands = cmds.filter(cmd => !cmd.Application.isSub);
 
   MainCommands.forEach(command => {
@@ -18,7 +16,7 @@ module.exports = async function (Application, cmds) {
       const Command = Application.commands.get(sub.commandName);
 
       if (!Command) {
-        throw new Error('Could Find The Command');
+        throw new Error('Could Find The Command ' + sub.commandName);
       }
 
       if (!Command.Application.isSub) {

@@ -104,14 +104,19 @@ class Command extends Base {
       };
       
       if (AliasGroup.sensitive && typeof AliasGroup.sensitive !== 'boolean') {
-        throw new Error("sensitive must be a Boolean only")
+        throw new Error("Sensitive must be a Boolean only")
+      };
+
+      if (AliasGroup.prefix && typeof AliasGroup.prefix !== 'boolean') {
+        throw new Error("Cut prefix propery can only have boolean value")  
       };
 
       this.Cuts.set(AliasGroup.cut.toLowerCase(), {
         sensitive: AliasGroup.sensitive,
         cmdName: this.name,
         cutName: AliasGroup.cut.toLowerCase(),
-        sensitiveName: AliasGroup.sensitive? AliasGroup.cut : AliasGroup.cut.toLowerCase()
+        sensitiveName: AliasGroup.sensitive? AliasGroup.cut : AliasGroup.cut.toLowerCase(),
+        withPrefix: AliasGroup.prefix? true : false
       })
 
     }

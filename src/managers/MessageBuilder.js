@@ -1,4 +1,4 @@
-const { Message, REST } = require('discord.js');
+const { Message, REST, MessagePayload, MessageReplyOptions } = require('discord.js');
 const Application = require('../structures/Application.js');
 const Api = require('../util/DiscordApi.js');
 
@@ -74,13 +74,16 @@ class MessageBuilder extends Message {
   }
 
   run() {
-    const args = this.content.split(/ +/g);
+
+    const args = this.content.includes(this.prefix)? this.content.slice(this.prefix.length).split(/ +/g) : this.content.split(/ +/g);
     const cutName = args.shift();
     const CommandFromCut = this.Application.commands.find(cmd => cmd.Application.Cuts.get(cutName.toLowerCase()));
-   
+    
     if (CommandFromCut) {
+      const CutFromCommand = CommandFromCut.Application.Cuts.get(cutName.toLowerCase());
       this.startsWithPrefix = true;
       this.commandFromCut = true;
+      this.withPrefix = CutFromCommand.withPrefix;
       this.cmdName = CommandFromCut.name;
       this.cutName = cutName
       this.isCmd = this.Application.getCommand(this.cmdName) ? true : false;
@@ -119,79 +122,71 @@ class MessageBuilder extends Message {
     return this.Command.getAttr(key);
   }
 
-  reply(options) {
-    return new Promise((resolve, reject) => {
-      const Routes = this.api.Routes;
+  // reply(options) {
+  //   return new Promise((resolve, reject) => {
+  //     const Routes = this.api.Routes;
 
-      options.message_reference = {
-        message_id: this.id,
-        guild_id: this?.guild?.id,
-        channel_id: this.channel.id,
-        fail_if_not_exists: true
-      };
+  //     options.message_reference = {
+  //       message_id: this.id,
+  //       guild_id: this?.guild?.id,
+  //       channel_id: this.channel.id,
+  //       fail_if_not_exists: true
+  //     };
 
-      this.REST.post(Routes.channelMessages(this.channel.id), { body: options }).then(data => {
-        this.replid = {
-          message_id: data.id,
-          guild_id: this?.guild?.id,
-          channel_id: this.channel.id,
-          fail_if_not_exists: true,
-        };
-        resolve(new MessageBuilder(this.client, data, this.Application));
-      });
+  //     this.REST.post(Routes.channelMessages(this.channel.id), { body: options }).then(data => {
+  //       this.replid = {
+  //         message_id: data.id,
+  //         guild_id: this?.guild?.id,
+  //         channel_id: this.channel.id,
+  //         fail_if_not_exists: true,
+  //       };
+  //       resolve(new MessageBuilder(this.client, data, this.Application));
+  //     });
 
-    });
-  };
+  //   });
+  // };
 
+  /**
+   * 
+   * @param {MessagePayload | MessageReplyOptions} options 
+   * @returns {Promise<Message<boolean>>}
+   */
   replyNoMention(options) {
     return new Promise((resolve, reject) => {
-
-      const Routes = this.api.Routes;
-
-      options.message_reference = {
-        message_id: this.id,
-        guild_id: this?.guild?.id,
-        channel_id: this.channel.id,
-        fail_if_not_exists: true
+      
+      if (!(typeof options === 'object') && (typeof options !== 'string')) {
+        throw new Error("Invalid reply arguments")
       };
 
-      options.allowed_mentions = {
-        replied_user: false
-      };
-
-      this.REST.post(Routes.channelMessages(this.channel.id), { body: options }).then(data => {
-        this.replid = {
-          message_id: data.id,
-          guild_id: this.guild?.id,
-          channel_id: this.channel.id,
-          fail_if_not_exists: true,
-        };
-        resolve(new MessageBuilder(this.client, data, this.Application));
-      });
-
+      options = (typeof options === 'string') ? { content: options } : options;
+      options.allowedMentions = {
+        repliedUser: false
+      }
+      this.reply(options).then(resolve).catch(reject);
     });
   };
 
-  followUp(options) {
-    return new Promise((resolve, reject) => {
-      const Routes = this.api.Routes;
-      if (!this.replid?.message_id) throw new Error("The reply to this message has not been sent");
-      options.message_reference = this.replid;
-      this.REST.post(Routes.channelMessages(this.channel.id), { body: options }).then(data => {
-        resolve(new MessageBuilder(this.client, data, this.Application));
-      }).catch(e => {
-        reject(e)
-      });
-    })
-  };
 
-  edit(options) {
-    return new Promise((resolve, reject) => {
-      const Routes = this.api.Routes;
-      options['Content-Type'] = 'application/json';
-      this.REST.patch(Routes.channelMessage(this.channel.id, this.id), { body: options }).then(data => resolve(new MessageBuilder(this.client, data, this.Application)));
-    })
-  }
+  // followUp(options) {
+  //   return new Promise((resolve, reject) => {
+  //     const Routes = this.api.Routes;
+  //     if (!this.replid?.message_id) throw new Error("The reply to this message has not been sent");
+  //     options.message_reference = this.replid;
+  //     this.REST.post(Routes.channelMessages(this.channel.id), { body: options }).then(data => {
+  //       resolve(new MessageBuilder(this.client, data, this.Application));
+  //     }).catch(e => {
+  //       reject(e)
+  //     });
+  //   })
+  // };
+
+  // edit(options) {
+  //   return new Promise((resolve, reject) => {
+  //     const Routes = this.api.Routes;
+  //     options['Content-Type'] = 'application/json';
+  //     this.REST.patch(Routes.channelMessage(this.channel.id, this.id), { body: options }).then(data => resolve(new MessageBuilder(this.client, data, this.Application)));
+  //   })
+  // }
 
   slice(start, end) {
     if (typeof start !== 'number' || typeof end !== 'number') {

@@ -25,6 +25,8 @@ module.exports = async function (client, main) {
     const Command = main.getCommand(message.cmdName);
 
     if (!message.commandFromCut && Command.Application.sensitive && Command.OrginName !== message.OrginCmdName) return;
+    if (message.commandFromCut && message.withPrefix && !message.content.includes(message.Application.prefix)) return;
+    if (message.commandFromCut && !message.withPrefix && message.content.includes(message.Application.prefix)) return;
 
     if (!Command.run && !Command.global) return;
 
@@ -49,17 +51,14 @@ module.exports = async function (client, main) {
     /** @type {Array<{ commandGroup: string, commandName: string }>} */
     const SubCommandDecleration = message.Command.Application.Subs;
 
-    console.log(GroupName, GroupChildName)
-
-
-    let subs =  SubCommandDecleration?.find(sub => sub.commandGroup?.toLowerCase() === GroupName &&  (GroupChildName ? sub.commandName === GroupChildName : true) );
+    let subs = SubCommandDecleration?.find(sub => sub.commandGroup?.toLowerCase() === GroupName && (GroupChildName ? sub.commandName === GroupChildName : true));
     if (!subs) subs = SubCommandDecleration.find(op => op.commandName.toLowerCase() === GroupName && !op.commandGroup);
 
     if (SubCommandDecleration.length > 0 && !subs) return;
 
 
     if (Command.global) {
-      global = await Command.global(message);
+      global = Command.global(message);
     };
 
     if (await message.isStoped()) return;
@@ -76,7 +75,7 @@ module.exports = async function (client, main) {
       if (GroupName === commandName) args = args.slice(1);
 
       if (args.length > 0) {
-        for (const i in args) message[i] = args[i]; 
+        for (const i in args) message[i] = args[i];
       } else {
         for (let i = 0; i <= 10; i++) {
           message[i] = undefined;
@@ -88,107 +87,30 @@ module.exports = async function (client, main) {
 
         const SubCommand = main.getCommand(GroupChildName);
 
-        if (!SubCommand.run) return
 
-        if (global && global.message) {
+        message.Command.Child = SubCommand;
+        message.GroupName = GroupName;
+        message.GroupChildName = GroupChildName;
 
-          message.Command.Child = SubCommand;
-          message.GroupName = GroupName;
-          message.GroupChildName = GroupChildName;
-          let subGlobal
-
-          if (SubCommand.global) {
-            subGlobal = await SubCommand.global(message, undefined, global.message);
-          }
-
-          if (subGlobal && subGlobal.message) {
-            SubCommand.run(message, subGlobal?.message);
-          } else if (subGlobal && !subGlobal.message) {
-            return
-          } else if (!subGlobal) {
-            SubCommand.run(message, null);
-          };
-
-
-        } else if (global && !global.message) {
-          return
-        } else if (!global) {
-
-          message.Command.Child = SubCommand;
-          message.GroupName = GroupName;
-          message.GroupChildName = GroupChildName;
-          let subGlobal
-
-          if (SubCommand.global) {
-            subGlobal = await SubCommand.global(message, undefined, global?.message);
-          }
-
-          if (subGlobal && subGlobal.message) {
-            SubCommand.run(message, subGlobal?.message);
-          } else if (subGlobal && !subGlobal.message) {
-            return
-          } else if (!subGlobal) {
-            SubCommand.run(message, null);
-          };
-
-        };
+        if (SubCommand.run) SubCommand.run(message, SubCommand?.global?.(message, undefined, global));
+        else SubCommand?.global?.(message, undefined, global);
 
         return;
 
       } else if (GroupName === commandName) {
         const SubCommand = main.getCommand(GroupName);
-        if (!SubCommand.run) return;
-        if (global && global.message) {
-          message.Command.Child = SubCommand;
-          message.GroupName = GroupName;
-          let subGlobal
 
-          if (SubCommand.global) {
-            subGlobal = await SubCommand.global(message, undefined, global?.message);
-          }
+        message.Command.Child = SubCommand;
+        message.GroupName = GroupName;
+  
+        if (SubCommand.run) SubCommand.run(message, SubCommand?.global?.(message, undefined, global));
+        else SubCommand?.global?.(message, undefined, global);
 
-          if (subGlobal && subGlobal.message) {
-            SubCommand.run(message, subGlobal?.message);
-          } else if (subGlobal && !subGlobal.message) {
-            return
-          } else if (!subGlobal) {
-            SubCommand.run(message, null);
-          };
-
-        } else if (global && !global.message) {
-          return
-        } else if (!global) {
-          message.Command.Child = SubCommand;
-          message.GroupName = GroupName;
-          let subGlobal
-
-          if (SubCommand.global) {
-            subGlobal = await SubCommand.global(message, undefined, global?.message);
-          }
-
-          if (subGlobal && subGlobal.message) {
-            SubCommand.run(message, subGlobal?.message);
-          } else if (subGlobal && !subGlobal.message) {
-            return
-          } else if (!subGlobal) {
-            SubCommand.run(message, null);
-          };
-        };
-
-        return;
-
+        return
       }
     } else {
-      if (global && global.message) {
-        if (!Command.run) return
-        Command.run(message, global?.message);
-      } else if (global && !global.message) {
-        return
-      } else if (!global) {
-        if (!Command.run) return
-        Command.run(message, null);
-      }
-    }
+      message.Command?.run?.(message, global);
+    };
 
 
   });

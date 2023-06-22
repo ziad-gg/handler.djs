@@ -22,7 +22,7 @@ module.exports = async function (pathManeger, main) {
     cmd.category = !cmd.category ? getFileCategory(file) : cmd.category;
     const cmdBuilder = await new CommandBuilder(cmd, main).new();
 
-    if (commands.find(e => e.name.toLowerCase() === cmd.name.toLowerCase() && !cmd.disabed)) throw new DiscordjsTypeError(ErrorCodes.InvalidType, `${file}`, "repeated command", true)
+    if (commands.find(e => e.name.toLowerCase() === cmd.name.toLowerCase() && !cmd.disabed && !cmd.isSub)) throw new DiscordjsTypeError(ErrorCodes.InvalidType, `${file}`, "repeated command", true)
     commands.push(cmdBuilder);
     
   };

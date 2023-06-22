@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Message } = require("discord.js");
+const { SlashCommandBuilder, InteractionResponse } = require("discord.js");
 const { CommandBuilder } = require("../../src");
 
 module.exports = new CommandBuilder()
@@ -6,7 +6,7 @@ module.exports = new CommandBuilder()
 .setDescription('Hello World')
 .setCooldown(10_000)
 .setAliases([ 
-    { cut: '.m', sensitive: true },
+    { cut: '.m', prefix: true },
 ])
 // .isSensitive()
 .InteractionOn(new SlashCommandBuilder())
@@ -15,12 +15,14 @@ module.exports = new CommandBuilder()
 
 /**
  * 
- * @param {Message} interaction 
+ * @param {InteractionResponse} interaction 
  */
 
+
 function Execute (interaction) {
-    // interaction.reply({ content: "Hello From Word" })
-    interaction.commandFromCut? interaction.replyNoMention({ content: "Hello From Word By Cut Request" }) : interaction.replyNoMention({ content: "Hello From Word By Main Request" })
+    console.log(interaction)
+    interaction.reply({ content: "Hello From Word" })
+    // interaction.commandFromCut? interaction.replyNoMention({ content: "Hello From Word By Cut Request" }) : interaction.replyNoMention({ content: "Hello From Word By Main Request" })
     // interaction.channel.send({ content: "Hello From Word" });
     
 //  interaction.channel.send({ content: "Hello World" })

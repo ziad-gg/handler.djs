@@ -1,19 +1,27 @@
-const { CommandInteraction, Client, Options } = require('discord.js');
+const { CommandInteraction, MessageReplyOptions, MessagePayload, Message, REST, ChatInputCommandInteraction } = require('discord.js');
 const Application = require('../structures/Application.js');
 const extractInteractionOptions = require('../util/extractArguments.js')
 
+// new ChatInputCommandInteraction()
 
 class InteractionBuilder extends CommandInteraction {
     constructor(client, ApiInteraction, Application) {
-        super(client, ApiInteraction)
+        super(client, ApiInteraction);
 
-        this.ApiRes = ApiInteraction
+        this.ApiRes = ApiInteraction;
+
+        // this.message = new MessageComponentInteraction(client, this.ApiRes)
+    
         /** @type {Application} */
         this.Application = Application;
         this.Api = ApiInteraction;
         this.prefix = this.Application.prefix;
         this.data = Application.data;
         this.stoped = false;
+
+        this.api = this.Application.REST_API;
+        /** @type {REST} */
+        this.REST = this.api.REST;
     };
 
 
@@ -33,6 +41,26 @@ class InteractionBuilder extends CommandInteraction {
         })
     };
 
+    /**
+     * 
+     * @param {MessagePayload | MessageReplyOptions} options 
+     * @returns {Promise<Message<boolean>>}
+     */
+    replyNoMention(options) {
+        return new Promise((resolve, reject) => {
+
+            if (!(typeof options === 'object') && (typeof options !== 'string')) {
+                throw new Error("Invalid reply arguments")
+            };
+
+            options = (typeof options === 'string') ? { content: options } : options;
+            options.allowedMentions = {
+                repliedUser: false
+            }
+            this.reply(options).then(resolve).catch(reject);
+        });
+    };
+
 
 
     run() {
@@ -44,7 +72,7 @@ class InteractionBuilder extends CommandInteraction {
         this.author.isOwner = this.Application.owners.includes(this.author.id);
         this.Command = this.Application.getCommand(this.cmdName);
 
-        this.replyNoMention = this.reply;
+        // this.replyNoMention = this.reply;
 
         return this;
     };
